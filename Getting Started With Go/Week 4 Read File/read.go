@@ -47,7 +47,7 @@ func main() {
 
 	} else {
 		//convert file into slice of name struct
-		nameSlice := convertLineToSlice(file)
+		nameSlice := convertFileToSlice(file)
 		//print out slice of struct
 		printNameStructs(nameSlice)
 	}
@@ -60,18 +60,16 @@ func printNameStructs(names []name) {
 	}
 }
 
-func convertLineToSlice(file io.Reader) []name {
+func convertFileToSlice(file io.Reader) []name {
 
 	scanner := bufio.NewScanner(file)
 	names := make([]name, 1)
 
-	//read each line and get the first and last name
+	//read each line and create a name struct with details and appends to slice
 	for scanner.Scan() {
 
 		var text = scanner.Text()
-
-		n := getName(text)
-
+		n := createNameStruct(text)
 		names = append(names, n)
 
 	}
@@ -79,7 +77,7 @@ func convertLineToSlice(file io.Reader) []name {
 	return names
 }
 
-func getName(line string) name {
+func createNameStruct(line string) name {
 
 	fname, lname := getNameDetails(line)
 	var n name
