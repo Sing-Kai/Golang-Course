@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 type name struct {
@@ -17,13 +18,11 @@ const (
 )
 
 func (n *name) SetLength(fname string, lname string) {
-
 	n.fname = setNameLen(fname)
-
 	n.lname = setNameLen(lname)
-
 }
 
+//set the name lengths a max of 20
 func setNameLen(name string) string {
 
 	if len(name) > maxLength {
@@ -39,8 +38,7 @@ func main() {
 	//prompt the user for the name of the text file
 	fmt.Println("enter name of file (include .txt extension) :")
 
-	fileName := scanLine()
-
+	fileName := scanFileName()
 	file, err := os.Open(fileName)
 
 	if err != nil {
@@ -48,40 +46,70 @@ func main() {
 		fmt.Printf("Error %s /n", err)
 
 	} else {
-
 		//convert file into slice of name struct
-		nameSlice := convertNamesToSlice(file)
-
+		nameSlice := convertLineToSlice(file)
 		//print out slice of struct
 		printNameStructs(nameSlice)
-
 	}
 }
 
 func printNameStructs(names []name) {
 
 	for _, name := range names {
-
-		fmt.Printf("first name: %s last name: %s /n", name.fname, name.lname)
+		fmt.Printf("%s %s \n", name.fname, name.lname)
 	}
 }
 
-func convertNamesToSlice(file io.Reader) []name {
+func convertLineToSlice(file io.Reader) []name {
 
 	scanner := bufio.NewScanner(file)
-
 	names := make([]name, 1)
 
+	//read each line and get the first and last name
 	for scanner.Scan() {
 
-		//convert line into name struct
+		var text = scanner.Text()
+
+		n := getName(text)
+
+		names = append(names, n)
 
 	}
 
 	return names
 }
 
-func scanLine() string {
+func getName(line string) name {
+
+	fname, lname := getNameDetails(line)
+	var n name
+	n.SetLength(fname, lname)
+
+	return n
+}
+
+//reads line and gets name details
+func getNameDetails(line string) (string, string) {
+
+	detailsArr := strings.Split(line, " ")
+
+	emptyStr := ""
+
+	//empty line
+	if line == emptyStr {
+		fmt.Println("empty line")
+		return emptyStr, emptyStr
+	}
+
+	//missing last name
+	if len(detailsArr) < 2 {
+		return detailsArr[0], emptyStr
+	}
+
+	return detailsArr[0], detailsArr[1]
+}
+
+func scanFileName() string {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
