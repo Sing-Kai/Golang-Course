@@ -25,8 +25,6 @@ func main() {
 
 	slice := make([]int, 3)
 
-	i := 0
-
 	for {
 		fmt.Println("Enter an integer: ")
 		scanner := bufio.NewScanner(os.Stdin)
@@ -45,8 +43,6 @@ func main() {
 			slice = append(slice, tempInt)
 
 			sortSlice(slice)
-
-			i++
 
 		} else {
 
