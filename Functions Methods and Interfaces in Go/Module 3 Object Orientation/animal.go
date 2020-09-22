@@ -7,37 +7,35 @@ import (
 	"strings"
 )
 
-type animal struct {
+//Animal class
+type Animal struct {
 	food       string
 	locomotion string
 	noise      string
 }
 
-func (a *animal) SetFields(f string, l string, n string) {
-	a.food = f
-	a.locomotion = l
-	a.noise = n
-}
-
-func (a *animal) Eat() string {
+//Eat return what animal eats
+func (a *Animal) Eat() string {
 	return a.food
 }
 
-func (a *animal) Move() string {
+//Move return how animal moves
+func (a *Animal) Move() string {
 	return a.locomotion
 }
 
-func (a *animal) Speak() string {
+//Speak return what noise animal makes
+func (a *Animal) Speak() string {
 	return a.noise
 }
 
 func main() {
 
-	cow := animal{food: "grass", locomotion: "walk", noise: "moo"}
-	bird := animal{food: "worms", locomotion: "fly", noise: "peep"}
-	snake := animal{food: "mice", locomotion: "sither", noise: "hsss"}
+	cow := Animal{food: "grass", locomotion: "walk", noise: "moo"}
+	bird := Animal{food: "worms", locomotion: "fly", noise: "peep"}
+	snake := Animal{food: "mice", locomotion: "sither", noise: "hsss"}
 
-	animals := []animal{cow, bird, snake}
+	animals := []Animal{cow, bird, snake}
 
 	fmt.Println("Enter request. Press ctrl + c to exit")
 
@@ -53,7 +51,7 @@ func main() {
 	}
 }
 
-func processRequest(a animal, req string) {
+func processRequest(a Animal, req string) {
 
 	if req == "eat" {
 		fmt.Printf("%s \n", a.Eat())
@@ -64,7 +62,7 @@ func processRequest(a animal, req string) {
 	}
 }
 
-func getAnimal(a string, animals []animal) animal {
+func getAnimal(a string, animals []Animal) Animal {
 
 	if a == "cow" {
 		return animals[0]
