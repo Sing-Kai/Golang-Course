@@ -95,37 +95,64 @@ func (a *Snake) Speak() string {
 
 func main() {
 
+	var a animalCollection
+
+	a.animals = map[string]Animal{}
+
 	for {
 
 		fmt.Print("> ")
 		userRequest := scanUserRequest()
-		processRequest(userRequest)
+		processRequest(userRequest, a)
 	}
 
 }
 
 //create animal collection struct to store map of animals
-
 type animalCollection struct {
+	animals map[string]Animal
 }
 
 //method name is unique
+func hasName(name string) bool {
+	return true
+}
 
 //method add animal
+func (a *animalCollection) newAnimal(name string, animal Animal) {
+	a.animals[name] = animal
+}
 
 //method return animal
+func (a *animalCollection) getAnimalByName(name string) Animal {
+	return a.animals[name]
+}
 
-func processRequest(userRequest userRequest) {
+func processRequest(userRequest userRequest, a animalCollection) string {
 
-	if validCmd(userRequest.cmd) {
+	if !validCmd(userRequest.cmd) {
 
-		cmdType := commandType(userRequest.cmd)
-
-	} else {
-
-		fmt.Println("incorrect command: must be newanimal or query")
-
+		return "incorrect command: must be newanimal or query"
 	}
+
+	cmdType := commandType(userRequest.cmd)
+
+	if cmdType == newAnimal {
+
+		//valid animal is correct
+		//get name
+		//check name is not already in use
+		//add animal to collecion, use name as key
+		//add error type interface
+	}
+
+	if cmdType == query {
+		//validate query command is correct
+		//return animal by name from animalCollection
+		//if not found throw errow
+		//execute query
+	}
+
 }
 
 //process to decide if its a new animal or query
@@ -139,9 +166,7 @@ func commandType(str string) cmdType {
 }
 
 func validCmd(cmd string) bool {
-
 	return cmd == "newanimal" || cmd == "query"
-
 }
 
 //function scan user input
