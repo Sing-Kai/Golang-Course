@@ -104,7 +104,14 @@ func main() {
 
 		fmt.Print("> ")
 		userRequest := scanUserRequest()
-		processRequest(userRequest, a)
+
+		if !validCmd(userRequest.cmd) {
+			fmt.Println("> incorrect command entered... ")
+			fmt.Println("> new animal example: newanimal james cow")
+			fmt.Println("> query animal exmaple: query james eat")
+		} else {
+			processRequest(userRequest, a)
+		}
 	}
 
 }
@@ -114,51 +121,51 @@ type animalCollection struct {
 	animals map[string]Animal
 }
 
-//method name is unique
-func (a *animalCollection) hasName(name string) bool {
-
-	_, ok := a.animals[name]
-
-	return ok
-}
-
 //method add animal
-func (a *animalCollection) newAnimal(name string, animal Animal) {
+func (a *animalCollection) newAnimal(name string, animal Animal) error {
 
-	if _, keyPresent := a.animals[name]; !keyPresent {
-		a.animals[name] = animal
+	if _, keyPresent := a.animals[name]; keyPresent {
+		return errors.New("animal name has been used already, please choose another")
 	}
-}
 
-//method return animal
-func (a *animalCollection) getAnimalByName(name string) Animal {
-
-	return a.animals[name]
+	a.animals[name] = animal
+	return nil
 }
 
 func processRequest(userRequest userRequest, a animalCollection) {
 
-	if !validCmd(userRequest.cmd) {
-		fmt.Println("incorrect command: must be newanimal or query")
-	}
-
 	cmdType := commandType(userRequest.cmd)
 
 	if cmdType == newAnimal {
-
-		if animal, err := getAnimal(userRequest.inputTwo); err != nil {
-			fmt.Println(err)
-		} else {
-			a.newAnimal(userRequest.inputOne, animal)
-		}
+		processNewAnimal(userRequest, a)
 	}
 
 	if cmdType == query {
-		name := userRequest.inputOne
-		animal := a.animals[name]
-		animalAction(userRequest.inputTwo, animal)
+		processQuery(userRequest, a)
 	}
+}
 
+func processNewAnimal(userRequest userRequest, a animalCollection) {
+
+	if animal, err := getAnimal(userRequest.inputTwo); err != nil {
+		fmt.Println(err)
+	} else {
+
+		if err := a.newAnimal(userRequest.inputOne, animal); err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
+func processQuery(userRequest userRequest, a animalCollection) {
+
+	name := userRequest.inputOne
+
+	if animal, ok := a.animals[name]; ok {
+		animalAction(userRequest.inputTwo, animal)
+	} else {
+		println("name entered was not found")
+	}
 }
 
 //process to decide if its a new animal or query
@@ -172,36 +179,7 @@ func commandType(str string) cmdType {
 }
 
 func validCmd(cmd string) bool {
-	return cmd == "newanimal" || cmd == "query"
-}
-
-//function scan user input
-func scanUserRequest() userRequest {
-
-	emptyStr := " "
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	line := scanner.Text()
-	line = strings.Trim(line, emptyStr)
-	arr := strings.Split(line, emptyStr)
-
-	var userRequest userRequest
-
-	if len(arr) != 3 {
-
-		userRequest.cmd = emptyStr
-		userRequest.inputOne = emptyStr
-		userRequest.inputTwo = emptyStr
-
-		return userRequest
-	}
-
-	userRequest.cmd = arr[0]
-	userRequest.inputOne = arr[1]
-	userRequest.inputTwo = arr[2]
-
-	return userRequest
-
+	return strings.ToLower(cmd) == "newanimal" || strings.ToLower(cmd) == "query"
 }
 
 func getAnimal(str string) (Animal, error) {
@@ -209,7 +187,7 @@ func getAnimal(str string) (Animal, error) {
 	str = strings.ToLower(str)
 
 	if str == "cow" {
-		cow := Cow{food: "grass", locomotion: "walk", noise: "mo"}
+		cow := Cow{food: "grass", locomotion: "walk", noise: "moo"}
 		return cow, nil
 	}
 
@@ -239,12 +217,31 @@ func animalAction(input string, a Animal) {
 	}
 }
 
-func validAnimal(a string) bool {
+//function scan user input
+func scanUserRequest() userRequest {
 
-	return strings.ToLower(a) == "cow" || strings.ToLower(a) == "bird" || strings.ToLower(a) == "snake"
-}
+	emptyStr := " "
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	line := scanner.Text()
+	line = strings.Trim(line, emptyStr)
+	arr := strings.Split(line, emptyStr)
 
-func validRequest(request string) bool {
+	var userRequest userRequest
 
-	return strings.ToLower(request) == "eat" || strings.ToLower(request) == "move" || strings.ToLower(request) == "speak"
+	if len(arr) != 3 {
+
+		userRequest.cmd = emptyStr
+		userRequest.inputOne = emptyStr
+		userRequest.inputTwo = emptyStr
+
+		return userRequest
+	}
+
+	userRequest.cmd = arr[0]
+	userRequest.inputOne = arr[1]
+	userRequest.inputTwo = arr[2]
+
+	return userRequest
+
 }
