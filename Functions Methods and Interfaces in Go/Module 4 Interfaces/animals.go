@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -35,18 +36,18 @@ type Cow struct {
 }
 
 //Eat return what animal eats
-func (a *Cow) Eat() string {
-	return a.food
+func (a Cow) Eat() {
+	fmt.Printf("%s \n", a.food)
 }
 
 //Move return how animal moves
-func (a *Cow) Move() string {
-	return a.locomotion
+func (a Cow) Move() {
+	fmt.Printf("%s \n", a.locomotion)
 }
 
 //Speak return what noise animal makes
-func (a *Cow) Speak() string {
-	return a.noise
+func (a Cow) Speak() {
+	fmt.Printf("%s \n", a.noise)
 }
 
 //Bird struct
@@ -57,18 +58,18 @@ type Bird struct {
 }
 
 //Eat return what animal eats
-func (a *Bird) Eat() string {
-	return a.food
+func (a Bird) Eat() {
+	fmt.Printf("%s \n", a.food)
 }
 
 //Move return how animal moves
-func (a *Bird) Move() string {
-	return a.locomotion
+func (a Bird) Move() {
+	fmt.Printf("%s \n", a.locomotion)
 }
 
 //Speak return what noise animal makes
-func (a *Bird) Speak() string {
-	return a.noise
+func (a Bird) Speak() {
+	fmt.Printf("%s \n", a.noise)
 }
 
 //Snake struct
@@ -79,18 +80,18 @@ type Snake struct {
 }
 
 //Eat return what animal eats
-func (a *Snake) Eat() string {
-	return a.food
+func (a Snake) Eat() {
+	fmt.Printf("%s \n", a.food)
 }
 
 //Move return how animal moves
-func (a *Snake) Move() string {
-	return a.locomotion
+func (a Snake) Move() {
+	fmt.Printf("%s \n", a.locomotion)
 }
 
 //Speak return what noise animal makes
-func (a *Snake) Speak() string {
-	return a.noise
+func (a Snake) Speak() {
+	fmt.Printf("%s \n", a.noise)
 }
 
 func main() {
@@ -114,43 +115,48 @@ type animalCollection struct {
 }
 
 //method name is unique
-func hasName(name string) bool {
-	return true
+func (a *animalCollection) hasName(name string) bool {
+
+	_, ok := a.animals[name]
+
+	return ok
 }
 
 //method add animal
 func (a *animalCollection) newAnimal(name string, animal Animal) {
-	a.animals[name] = animal
+
+	if _, keyPresent := a.animals[name]; !keyPresent {
+		a.animals[name] = animal
+	}
 }
 
 //method return animal
 func (a *animalCollection) getAnimalByName(name string) Animal {
+
 	return a.animals[name]
 }
 
-func processRequest(userRequest userRequest, a animalCollection) string {
+func processRequest(userRequest userRequest, a animalCollection) {
 
 	if !validCmd(userRequest.cmd) {
-
-		return "incorrect command: must be newanimal or query"
+		fmt.Println("incorrect command: must be newanimal or query")
 	}
 
 	cmdType := commandType(userRequest.cmd)
 
 	if cmdType == newAnimal {
 
-		//valid animal is correct
-		//get name
-		//check name is not already in use
-		//add animal to collecion, use name as key
-		//add error type interface
+		if animal, err := getAnimal(userRequest.inputTwo); err != nil {
+			fmt.Println(err)
+		} else {
+			a.newAnimal(userRequest.inputOne, animal)
+		}
 	}
 
 	if cmdType == query {
-		//validate query command is correct
-		//return animal by name from animalCollection
-		//if not found throw errow
-		//execute query
+		name := userRequest.inputOne
+		animal := a.animals[name]
+		animalAction(userRequest.inputTwo, animal)
 	}
 
 }
@@ -196,6 +202,41 @@ func scanUserRequest() userRequest {
 
 	return userRequest
 
+}
+
+func getAnimal(str string) (Animal, error) {
+
+	str = strings.ToLower(str)
+
+	if str == "cow" {
+		cow := Cow{food: "grass", locomotion: "walk", noise: "mo"}
+		return cow, nil
+	}
+
+	if str == "bird" {
+		bird := Bird{food: "worms", locomotion: "fly", noise: "peep"}
+		return bird, nil
+	}
+
+	if str == "snake" {
+		snake := Snake{food: "mice", locomotion: "slither", noise: "hsss"}
+		return snake, nil
+	}
+
+	return nil, errors.New("animal type was unrecognised")
+}
+
+func animalAction(input string, a Animal) {
+
+	if input == "eat" {
+		a.Eat()
+	} else if input == "move" {
+		a.Move()
+	} else if input == "speak" {
+		a.Speak()
+	} else {
+		println("input incorrect must be: eat, move or speak")
+	}
 }
 
 func validAnimal(a string) bool {
