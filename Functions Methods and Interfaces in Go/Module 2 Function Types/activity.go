@@ -12,14 +12,13 @@ func main() {
 	velocity := getUserInput("enter verlocity: ")
 	displacement := getUserInput("enter displacement: ")
 
+	//returns function that computes time
 	fn := genDisplaceFn(acceleration, velocity, displacement)
 
-	//promot user to enter time one
 	t1 := getUserInput("enter time value: ")
 	fmt.Print("Result: ")
 	fmt.Println(fn(t1))
 
-	//promot user to enter time one
 	t2 := getUserInput("enter another time value: ")
 	fmt.Print("Result: ")
 	fmt.Println(fn(t2))
@@ -28,6 +27,7 @@ func main() {
 
 func genDisplaceFn(a float64, v float64, d float64) func(t float64) float64 {
 
+	//function used to compute time
 	fn := func(t float64) float64 {
 		//formula
 		s := (a*math.Pow(t, 2))/2 + v*t + d

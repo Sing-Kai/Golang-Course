@@ -73,7 +73,7 @@ func getAnimal(a string, animals []Animal) Animal {
 	}
 }
 
-func scanUserRequest() (string, string) {
+func scanUserRequest() (string, string, string) {
 
 	emptyStr := " "
 	scanner := bufio.NewScanner(os.Stdin)
@@ -83,10 +83,10 @@ func scanUserRequest() (string, string) {
 	arr := strings.Split(line, emptyStr)
 
 	if len(arr) != 2 {
-		return emptyStr, emptyStr
+		return emptyStr, emptyStr, emptyStr
 	}
 
-	return arr[0], arr[1]
+	return arr[0], arr[1], arr[2]
 
 }
 
