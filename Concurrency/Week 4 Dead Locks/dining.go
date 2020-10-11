@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 /*
 Dining Philosopher Problem
 */
-
 type chopStick struct{ sync.Mutex }
 
 type philo struct {
@@ -29,12 +29,11 @@ func (p philo) eat(philo int, wg *sync.WaitGroup) {
 		p.rightCS.Lock()
 
 		fmt.Printf("starting to eat %v \n", philo)
+		time.Sleep(1 * time.Second)
+		fmt.Printf("finishing eating %v \n", philo)
 
 		p.rightCS.Unlock()
 		p.leftCS.Unlock()
-
-		fmt.Printf("finishing eating %v \n", philo)
-
 		//tell host eating has done frees channel
 		<-host
 
