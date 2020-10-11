@@ -15,9 +15,15 @@ type philo struct {
 	leftCS, rightCS *chopStick
 }
 
+// host to limit two philosophers to eat at the same time
+var host = make(chan bool, 2)
+
 func (p philo) eat(philo int, wg *sync.WaitGroup) {
 
 	for i := 0; i < 3; i++ {
+
+		//get host permission to eat, wait if full
+		host <- true
 
 		p.leftCS.Lock()
 		p.rightCS.Lock()
@@ -27,10 +33,14 @@ func (p philo) eat(philo int, wg *sync.WaitGroup) {
 		p.rightCS.Unlock()
 		p.leftCS.Unlock()
 
-		fmt.Printf("finishing eating %v \n ", philo)
+		fmt.Printf("finishing eating %v \n", philo)
 
-		wg.Done()
+		//tell host eating has done frees channel
+		<-host
+
 	}
+
+	wg.Done()
 }
 
 func main() {
@@ -46,17 +56,15 @@ func main() {
 
 	//create 5 philosophers with chopsticks
 	for i := 0; i < 5; i++ {
-		//change to not being the lowest number first
 		philos[i] = &philo{cSticks[i], cSticks[(i+1)%5]}
 	}
 
-	//need to add some sort of wait group for syncronisation
-	//all a maximum of two
+	//start eating
 	var wg sync.WaitGroup
 
 	for i := 0; i < 5; i++ {
-		wg.Add(2)
-		go philos[i].eat(i, &wg)
+		wg.Add(1)
+		go philos[i].eat(i+1, &wg)
 	}
 
 	wg.Wait()
